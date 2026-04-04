@@ -25,16 +25,19 @@ dependencies:
   webview_flutter: ^4.10.0
 
   # Utilities
-  intl: ^0.19.0
+  intl: ^0.20.2
   uuid: ^4.4.2
 
   # State management
   provider: ^6.1.2
 
+  # Persistent storage
+  shared_preferences: ^2.3.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true

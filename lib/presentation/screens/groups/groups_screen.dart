@@ -36,7 +36,6 @@ class _GroupsScreenState extends State<GroupsScreen> {
 
     final groups = await _groupRepo.getAllGroups();
 
-    // Load total expenses for each group to show on the card.
     final totals = <String, double>{};
     for (final g in groups) {
       totals[g.id] = await _expenseRepo.getTotalForGroup(g.id);
@@ -66,7 +65,6 @@ class _GroupsScreenState extends State<GroupsScreen> {
         builder: (_) => GroupDetailScreen(group: group),
       ),
     );
-    // Refresh when returning from group detail (expenses may have changed).
     _loadGroups();
   }
 
@@ -97,27 +95,20 @@ class _GroupsScreenState extends State<GroupsScreen> {
     }
   }
 
-  // ─── Build ────────────────────────────────────────────────────────────────────
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      // Let Scaffold use the theme's scaffoldBackgroundColor automatically
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnPrimary,
         title: const Text(
           AppStrings.appName,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
         ),
         centerTitle: false,
         elevation: 0,
-        actions: const [],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _navigateToAddGroup,
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnPrimary,
         icon: const Icon(Icons.add),
         label: const Text(AppStrings.createGroup),
       ),
@@ -138,12 +129,12 @@ class _GroupsScreenState extends State<GroupsScreen> {
           children: [
             Icon(Icons.group_outlined,
                 size: 80,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35)),
+                color: Theme.of(context).hintColor.withOpacity(0.35)),
             const SizedBox(height: 16),
             Text(
               AppStrings.noGroups,
               style: AppTextStyles.bodyLarge.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                  color: Theme.of(context).hintColor.withOpacity(0.6)),
               textAlign: TextAlign.center,
             ),
           ],
@@ -170,8 +161,6 @@ class _GroupsScreenState extends State<GroupsScreen> {
   }
 }
 
-// ─── Group Card Widget ────────────────────────────────────────────────────────
-
 class _GroupCard extends StatelessWidget {
   final GroupModel group;
   final double total;
@@ -193,8 +182,6 @@ class _GroupCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shadowColor: Colors.black12,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -202,10 +189,9 @@ class _GroupCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
-              // Avatar circle with first letter
               CircleAvatar(
                 radius: 26,
-                backgroundColor: color.withValues(alpha: 0.15),
+                backgroundColor: color.withOpacity(0.15),
                 child: Text(
                   group.name.isNotEmpty
                       ? group.name[0].toUpperCase()
@@ -218,15 +204,13 @@ class _GroupCard extends StatelessWidget {
               ),
               const SizedBox(width: 14),
 
-              // Name + description
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       group.name,
-                      style: AppTextStyles.titleMedium.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface),
+                      style: AppTextStyles.titleMedium,
                     ),
                     if (group.description.isNotEmpty) ...[
                       const SizedBox(height: 2),
@@ -237,30 +221,29 @@ class _GroupCard extends StatelessWidget {
                     ],
                     const SizedBox(height: 4),
                     Text(
-                      'Toplam: ₺${total.toStringAsFixed(2)}',
+                      'Total: ₺${total.toStringAsFixed(2)}',
                       style: AppTextStyles.bodySmall
-                          .copyWith(color: AppColors.primary),
+                          .copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
               ),
 
-              // Delete + chevron
               PopupMenuButton<String>(
                 icon: Icon(Icons.more_vert,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                    color: Theme.of(context).hintColor),
                 onSelected: (val) {
                   if (val == 'delete') onDelete();
                 },
                 itemBuilder: (_) => [
-                  PopupMenuItem(
+                  const PopupMenuItem(
                     value: 'delete',
                     child: Row(
-                      children: const [
+                      children: [
                         Icon(Icons.delete_outline,
                             color: AppColors.error, size: 18),
                         SizedBox(width: 8),
-                        Text(AppStrings.deleteGroup,
+                        Text('Delete Group',
                             style: TextStyle(color: AppColors.error)),
                       ],
                     ),
@@ -268,7 +251,7 @@ class _GroupCard extends StatelessWidget {
                 ],
               ),
               Icon(Icons.chevron_right,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35)),
+                  color: Theme.of(context).hintColor.withOpacity(0.35)),
             ],
           ),
         ),

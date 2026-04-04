@@ -8,10 +8,7 @@ import '../../../data/models/group_model.dart';
 import '../../../data/repositories/group_repository.dart';
 
 /// Form screen for creating OR editing a group.
-///
-/// Pass [existingGroup] to enter edit mode.
 class AddGroupScreen extends StatefulWidget {
-  /// If non-null the screen operates in edit mode.
   final GroupModel? existingGroup;
 
   const AddGroupScreen({super.key, this.existingGroup});
@@ -32,7 +29,6 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
   @override
   void initState() {
     super.initState();
-    // Pre-fill fields when editing.
     _nameController =
         TextEditingController(text: widget.existingGroup?.name ?? '');
     _descriptionController =
@@ -53,14 +49,12 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
     GroupModel result;
 
     if (widget.isEditing) {
-      // ── Edit existing group ────────────────────────────────────────────────
       result = widget.existingGroup!.copyWith(
         name: _nameController.text.trim(),
         description: _descriptionController.text.trim(),
       );
       await _groupRepo.updateGroup(result);
     } else {
-      // ── Create new group ───────────────────────────────────────────────────
       result = GroupModel(
         id: const Uuid().v4(),
         name: _nameController.text.trim(),
@@ -78,11 +72,8 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
     final isEditing = widget.isEditing;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnPrimary,
-        title: Text(isEditing ? 'Grubu Düzenle' : AppStrings.createGroup),
+        title: Text(isEditing ? 'Edit Group' : AppStrings.createGroup),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -92,29 +83,11 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header illustration
-              Container(
-                height: 100,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Center(
-                  child: Icon(
-                    isEditing ? Icons.edit_outlined : Icons.group_add_outlined,
-                    size: 48,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 28),
-
               // Group name
               Text(AppStrings.groupName, style: AppTextStyles.labelLarge),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _nameController,
-                style: const TextStyle(color: Color(0xFF212121)),
                 decoration: _inputDecoration(
                   hint: AppStrings.groupNameHint,
                   icon: Icons.group_outlined,
@@ -132,9 +105,8 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: _descriptionController,
-                style: const TextStyle(color: Color(0xFF212121)),
                 decoration: _inputDecoration(
-                  hint: 'ör. Avrupa Turu 2024',
+                  hint: 'e.g. Europe Tour 2024',
                   icon: Icons.notes_outlined,
                 ),
                 textCapitalization: TextCapitalization.sentences,
@@ -146,12 +118,7 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
               ElevatedButton(
                 onPressed: _saving ? null : _save,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.textOnPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  elevation: 2,
                 ),
                 child: _saving
                     ? const SizedBox(
@@ -160,7 +127,7 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
                         child: CircularProgressIndicator(
                             color: Colors.white, strokeWidth: 2))
                     : Text(
-                        isEditing ? 'Güncelle' : AppStrings.save,
+                        isEditing ? 'Update' : AppStrings.save,
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
@@ -176,26 +143,9 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
           {required String hint, required IconData icon}) =>
       InputDecoration(
         hintText: hint,
-        prefixIcon: Icon(icon, color: AppColors.primary),
-        filled: true,
-        fillColor: AppColors.surface,
+        prefixIcon: Icon(icon),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.error),
-        ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       );
 }
