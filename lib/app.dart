@@ -3,9 +3,13 @@ import 'package:provider/provider.dart';
 
 import 'core/constants/app_colors.dart';
 import 'core/theme/theme_provider.dart';
+import 'core/theme/user_provider.dart';
 import 'presentation/screens/groups/groups_screen.dart';
-import 'presentation/screens/preferences/preferences_screen.dart';
+import 'presentation/screens/map/all_expenses_map_screen.dart';
+import 'presentation/screens/profile/profile_screen.dart';
 import 'presentation/screens/webview/webview_screen.dart';
+
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 /// Root widget — sets up Provider, light + dark themes, and navigation shell.
 class SplitMateApp extends StatelessWidget {
@@ -13,11 +17,15 @@ class SplitMateApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
       child: Consumer<ThemeProvider>(
         builder: (_, themeProvider, __) => MaterialApp(
           title: 'SplitMate',
+          scaffoldMessengerKey: scaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
           themeMode: themeProvider.themeMode,
           theme: _buildLightTheme(),
@@ -63,7 +71,7 @@ class SplitMateApp extends StatelessWidget {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.surface,
-        indicatorColor: AppColors.primary.withValues(alpha: 0.12),
+        indicatorColor: AppColors.primary.withOpacity(0.12),
       ),
     );
   }
@@ -108,7 +116,7 @@ class SplitMateApp extends StatelessWidget {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: darkSurface,
-        indicatorColor: AppColors.primary.withValues(alpha: 0.2),
+        indicatorColor: AppColors.primary.withOpacity(0.2),
       ),
       dividerColor: Colors.white12,
     );
@@ -151,7 +159,7 @@ class SplitMateApp extends StatelessWidget {
 
 // ─── App Shell ────────────────────────────────────────────────────────────────
 
-/// Bottom-navigation shell: Groups, Tips, and Preferences tabs.
+/// Bottom-navigation shell: Groups, Map, Tips, and Profile tabs.
 class _AppShell extends StatefulWidget {
   const _AppShell();
 
@@ -169,8 +177,9 @@ class _AppShellState extends State<_AppShell> {
         index: _currentIndex,
         children: const [
           GroupsScreen(),
+          AllExpensesMapScreen(),
           WebViewScreen(),
-          PreferencesScreen(),
+          ProfileScreen(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -180,17 +189,22 @@ class _AppShellState extends State<_AppShell> {
           NavigationDestination(
             icon: Icon(Icons.group_outlined),
             selectedIcon: Icon(Icons.group, color: AppColors.primary),
-            label: 'Gruplar',
+            label: 'Groups',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.map_outlined),
+            selectedIcon: Icon(Icons.map, color: AppColors.primary),
+            label: 'Map',
           ),
           NavigationDestination(
             icon: Icon(Icons.lightbulb_outline),
             selectedIcon: Icon(Icons.lightbulb, color: AppColors.primary),
-            label: 'İpuçları',
+            label: 'Tips',
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings, color: AppColors.primary),
-            label: 'Tercihler',
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person, color: AppColors.primary),
+            label: 'Profile',
           ),
         ],
       ),
