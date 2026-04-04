@@ -6,7 +6,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_text_styles.dart';
 
 /// Full-screen Google Map that lets the user pin a location.
-/// Returns a Map<String, dynamic> with keys 'location' (LatLng) and 'label' (String).
+/// Returns a Map with keys 'location' (LatLng) and 'label' (String).
 class MapScreen extends StatefulWidget {
   /// Optional initial position (e.g. when editing an existing expense).
   final LatLng? initialLocation;

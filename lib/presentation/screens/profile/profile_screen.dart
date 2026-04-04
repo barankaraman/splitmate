@@ -106,9 +106,15 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _showEditProfileDialog(BuildContext context, UserProvider userProvider) {
-    final nameController = TextEditingController(text: userProvider.userName);
-    final emailController = TextEditingController(text: userProvider.userEmail);
+    final nameController = TextEditingController();
+    final emailController = TextEditingController();
     final formKey = GlobalKey<FormState>();
+
+    const hintStyle = TextStyle(
+      color: Color(0xFFAAAAAA),
+      fontStyle: FontStyle.italic,
+      fontSize: 14,
+    );
 
     showDialog(
       context: context,
@@ -121,14 +127,27 @@ class ProfileScreen extends StatelessWidget {
             children: [
               TextFormField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Ad Soyad'),
-                validator: (v) => v!.isEmpty ? 'Gerekli' : null,
+                style: const TextStyle(color: Color(0xFF212121)),
+                decoration: const InputDecoration(
+                  hintText: 'Ad Soyad',
+                  hintStyle: hintStyle,
+                  fillColor: Colors.white,
+                  filled: true,
+                ),
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Gerekli' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: emailController,
-                decoration: const InputDecoration(labelText: 'E-posta'),
-                validator: (v) => v!.isEmpty ? 'Gerekli' : null,
+                style: const TextStyle(color: Color(0xFF212121)),
+                decoration: const InputDecoration(
+                  hintText: 'E-posta',
+                  hintStyle: hintStyle,
+                  fillColor: Colors.white,
+                  filled: true,
+                ),
+                keyboardType: TextInputType.emailAddress,
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Gerekli' : null,
               ),
             ],
           ),
