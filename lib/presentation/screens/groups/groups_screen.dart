@@ -129,12 +129,12 @@ class _GroupsScreenState extends State<GroupsScreen> {
           children: [
             Icon(Icons.group_outlined,
                 size: 80,
-                color: Theme.of(context).hintColor.withOpacity(0.35)),
+                color: Theme.of(context).hintColor.withValues(alpha: 0.35)),
             const SizedBox(height: 16),
             Text(
               AppStrings.noGroups,
               style: AppTextStyles.bodyLarge.copyWith(
-                  color: Theme.of(context).hintColor.withOpacity(0.6)),
+                  color: Theme.of(context).hintColor.withValues(alpha: 0.6)),
               textAlign: TextAlign.center,
             ),
           ],
@@ -191,7 +191,7 @@ class _GroupCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 26,
-                backgroundColor: color.withOpacity(0.15),
+                backgroundColor: color.withValues(alpha: 0.15),
                 child: Text(
                   group.name.isNotEmpty
                       ? group.name[0].toUpperCase()
@@ -251,7 +251,7 @@ class _GroupCard extends StatelessWidget {
                 ],
               ),
               Icon(Icons.chevron_right,
-                  color: Theme.of(context).hintColor.withOpacity(0.35)),
+                  color: Theme.of(context).hintColor.withValues(alpha: 0.35)),
             ],
           ),
         ),
