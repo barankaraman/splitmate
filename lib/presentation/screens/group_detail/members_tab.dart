@@ -184,7 +184,7 @@ class MembersTabState extends State<MembersTab> with AutomaticKeepAliveClientMix
           margin: const EdgeInsets.only(bottom: 8),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: color.withOpacity(0.1),
+              backgroundColor: color.withValues(alpha: 0.1),
               child: Text(
                 member.name.isNotEmpty ? member.name[0].toUpperCase() : '?',
                 style: TextStyle(color: color, fontWeight: FontWeight.bold),
