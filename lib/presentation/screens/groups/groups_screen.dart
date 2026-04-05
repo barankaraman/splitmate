@@ -104,7 +104,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
           AppStrings.appName,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
         ),
-        centerTitle: false,
+        centerTitle: true,
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton.extended(
