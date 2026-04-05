@@ -26,6 +26,17 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _errorMessage;
 
   @override
+  void initState() {
+    super.initState();
+    // Check if session is already restored by initialize()
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (AuthService.instance.isLoggedIn) {
+        Navigator.of(context).pushReplacementNamed('/home');
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _userController.dispose();
     _passController.dispose();
@@ -43,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     bool success;
     if (_authMode == AuthMode.login) {
-      success = AuthService.instance.login(
+      success = await AuthService.instance.login(
         _userController.text.trim(),
         _passController.text,
       );
@@ -58,14 +69,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (success) {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final username = AuthService.instance.currentUser;
-      final capitalised =
-          username.isNotEmpty ? username[0].toUpperCase() + username.substring(1) : username;
-      
-      // Default email for new users, existing users keep theirs
-      await userProvider.updateUserData(capitalised, userProvider.userEmail);
+      userProvider.refresh(); // Signal providers that user changed
 
-      if (!mounted) return;
       Navigator.of(context).pushReplacementNamed('/home');
     } else {
       setState(() {
@@ -125,7 +130,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Username
                   TextFormField(
                     controller: _userController,
                     decoration: InputDecoration(
@@ -139,7 +143,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Password
                   TextFormField(
                     controller: _passController,
                     obscureText: _obscure,
