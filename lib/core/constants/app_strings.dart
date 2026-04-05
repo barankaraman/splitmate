@@ -8,13 +8,15 @@ class AppStrings {
 
   // Groups screen
   static const String groups = 'Groups';
-  static const String noGroups = 'No groups yet.\nTap + to create your first group!';
+  static const String noGroups =
+      'No groups yet.\nTap + to create your first group!';
   static const String createGroup = 'Create Group';
   static const String groupName = 'Group Name';
   static const String groupNameHint = 'e.g. Bali Trip, Flatmates…';
   static const String groupDescription = 'Description (optional)';
   static const String deleteGroup = 'Delete Group';
-  static const String deleteGroupConfirm = 'Are you sure you want to delete this group? All expenses will be lost.';
+  static const String deleteGroupConfirm =
+      'Are you sure you want to delete this group? All expenses will be lost.';
 
   // Members
   static const String members = 'Members';
@@ -23,7 +25,8 @@ class AppStrings {
   static const String memberNameHint = 'e.g. Alice';
   static const String noMembers = 'No members yet. Add some!';
   static const String removeMember = 'Remove Member';
-  static const String removeMemberConfirm = 'Remove this member from the group?';
+  static const String removeMemberConfirm =
+      'Remove this member from the group?';
 
   // Expenses
   static const String expenses = 'Expenses';
@@ -41,6 +44,9 @@ class AppStrings {
   // Summary / Settlement
   static const String summary = 'Summary';
   static const String settlement = 'Settlement';
+  static const String leaderboard = 'Leaderboard';
+  static const String topPayers = 'Top Payers';
+  static const String noLeaderboardData = 'No payments recorded yet.';
   static const String noDebts = 'Everyone is settled up!';
   static const String owes = 'owes';
   static const String totalExpenses = 'Total Expenses';
@@ -51,7 +57,8 @@ class AppStrings {
   // Map
   static const String pickLocation = 'Pick a Location';
   static const String confirmLocation = 'Confirm Location';
-  static const String tapToSelectLocation = 'Tap on the map to select a location';
+  static const String tapToSelectLocation =
+      'Tap on the map to select a location';
 
   // WebView
   static const String financialTips = 'Financial Tips';
@@ -66,7 +73,9 @@ class AppStrings {
   // Validation
   static const String fieldRequired = 'This field is required';
   static const String invalidAmount = 'Enter a valid amount greater than 0';
-  static const String selectAtLeastOneMember = 'Select at least one participant';
+  static const String selectAtLeastOneMember =
+      'Select at least one participant';
   static const String selectPayer = 'Please select who paid';
-  static const String addAtLeastTwoMembers = 'Add at least 2 members to record an expense';
+  static const String addAtLeastTwoMembers =
+      'Add at least 2 members to record an expense';
 }

@@ -6,11 +6,13 @@ import 'core/theme/theme_provider.dart';
 import 'core/theme/user_provider.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/groups/groups_screen.dart';
+import 'presentation/screens/leaderboard/leaderboard_screen.dart';
 import 'presentation/screens/map/all_expenses_map_screen.dart';
 import 'presentation/screens/profile/profile_screen.dart';
 import 'presentation/screens/webview/webview_screen.dart';
 
-final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 /// Root widget — sets up Provider, light + dark themes, and navigation shell.
 class SplitMateApp extends StatelessWidget {
@@ -65,8 +67,7 @@ class SplitMateApp extends StatelessWidget {
         color: AppColors.cardBackground,
         elevation: 2,
         shadowColor: Colors.black12,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
       inputDecorationTheme: _inputTheme(AppColors.surface),
       elevatedButtonTheme: _elevatedButtonTheme(),
@@ -110,8 +111,7 @@ class SplitMateApp extends StatelessWidget {
         color: darkCard,
         elevation: 2,
         shadowColor: Colors.black38,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
       inputDecorationTheme: _inputTheme(darkSurface),
       elevatedButtonTheme: _elevatedButtonTheme(),
@@ -145,8 +145,7 @@ class SplitMateApp extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: AppColors.primary, width: 2),
       ),
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
 
@@ -164,7 +163,7 @@ class SplitMateApp extends StatelessWidget {
 
 // ─── App Shell ────────────────────────────────────────────────────────────────
 
-/// Bottom-navigation shell: Groups, Map, Tips, and Profile tabs.
+/// Bottom-navigation shell: Groups, Map, Leaderboard, Tips, and Profile tabs.
 class _AppShell extends StatefulWidget {
   const _AppShell();
 
@@ -174,22 +173,31 @@ class _AppShell extends StatefulWidget {
 
 class _AppShellState extends State<_AppShell> {
   int _currentIndex = 0;
+  final _leaderboardKey = GlobalKey<LeaderboardScreenState>();
+
+  void _onDestinationSelected(int i) {
+    setState(() => _currentIndex = i);
+    if (i == 2) {
+      _leaderboardKey.currentState?.refreshOnTabSelected();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: const [
-          GroupsScreen(),
-          AllExpensesMapScreen(),
-          WebViewScreen(),
-          ProfileScreen(),
+        children: [
+          const GroupsScreen(),
+          const AllExpensesMapScreen(),
+          LeaderboardScreen(key: _leaderboardKey),
+          const WebViewScreen(),
+          const ProfileScreen(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (i) => setState(() => _currentIndex = i),
+        onDestinationSelected: _onDestinationSelected,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.group_outlined),
@@ -200,6 +208,11 @@ class _AppShellState extends State<_AppShell> {
             icon: Icon(Icons.map_outlined),
             selectedIcon: Icon(Icons.map, color: AppColors.primary),
             label: 'Map',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.leaderboard_outlined),
+            selectedIcon: Icon(Icons.leaderboard, color: AppColors.primary),
+            label: 'Leaderboard',
           ),
           NavigationDestination(
             icon: Icon(Icons.lightbulb_outline),
