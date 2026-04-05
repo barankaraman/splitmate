@@ -61,14 +61,13 @@ class _UserExpensesScreenState extends State<UserExpensesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Harcamalarım'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        title: const Text('My Expenses'),
+        centerTitle: true,
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _userExpensesWithGroup.isEmpty
-              ? const Center(child: Text('Henüz bir harcama yapmadınız.'))
+              ? const Center(child: Text('You haven\'t made any expenses yet.'))
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: _userExpensesWithGroup.length,
@@ -82,7 +81,7 @@ class _UserExpensesScreenState extends State<UserExpensesScreen> {
                         title: Text(expense.title),
                         subtitle: Text(groupName),
                         trailing: Text(
-                          '₺${expense.amount.toStringAsFixed(2)}',
+                          'TRY ${expense.amount.toStringAsFixed(2)}',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,

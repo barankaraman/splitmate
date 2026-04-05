@@ -2,7 +2,6 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// Singleton database helper.
-/// Manages the SQLite connection, schema creation, and migrations.
 class DatabaseHelper {
   // ─── Singleton ──────────────────────────────────────────────────────────────
 
@@ -20,9 +19,8 @@ class DatabaseHelper {
   // ─── Constants ───────────────────────────────────────────────────────────────
 
   static const String _dbName = 'splitmate.db';
-  static const int _dbVersion = 1;
+  static const int _dbVersion = 2; // Bumped version for schema update
 
-  // Table names
   static const String tableGroups = 'groups';
   static const String tableMembers = 'members';
   static const String tableExpenses = 'expenses';
@@ -39,16 +37,15 @@ class DatabaseHelper {
       version: _dbVersion,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
-      // Enable foreign-key constraints on every connection.
       onConfigure: (db) async => db.execute('PRAGMA foreign_keys = ON'),
     );
   }
 
-  /// Creates all tables on first launch.
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE $tableGroups (
         id           TEXT PRIMARY KEY,
+        owner_id     TEXT NOT NULL,
         name         TEXT NOT NULL,
         description  TEXT NOT NULL DEFAULT '',
         created_at   TEXT NOT NULL
@@ -92,20 +89,20 @@ class DatabaseHelper {
     ''');
   }
 
-  /// Called when _dbVersion is bumped; add ALTER TABLE statements here.
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // Future migrations will go here.
+    if (oldVersion < 2) {
+      // Add owner_id to groups table for multi-user support
+      await db.execute('ALTER TABLE $tableGroups ADD COLUMN owner_id TEXT NOT NULL DEFAULT ""');
+    }
   }
 
   // ─── Generic helpers ─────────────────────────────────────────────────────────
 
-  /// Insert a row; returns the row id.
   Future<int> insert(String table, Map<String, dynamic> values) async {
     final db = await database;
     return db.insert(table, values, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  /// Query all rows for [table] that match optional [where] / [whereArgs].
   Future<List<Map<String, dynamic>>> query(
     String table, {
     String? where,
@@ -116,7 +113,6 @@ class DatabaseHelper {
     return db.query(table, where: where, whereArgs: whereArgs, orderBy: orderBy);
   }
 
-  /// Update rows in [table] matching [where].
   Future<int> update(
     String table,
     Map<String, dynamic> values, {
@@ -127,7 +123,6 @@ class DatabaseHelper {
     return db.update(table, values, where: where, whereArgs: whereArgs);
   }
 
-  /// Delete rows from [table] matching [where].
   Future<int> delete(
     String table, {
     required String where,
@@ -137,13 +132,11 @@ class DatabaseHelper {
     return db.delete(table, where: where, whereArgs: whereArgs);
   }
 
-  /// Run multiple operations atomically.
   Future<T> transaction<T>(Future<T> Function(Transaction txn) action) async {
     final db = await database;
     return db.transaction(action);
   }
 
-  /// Close the database (used in tests / app shutdown).
   Future<void> close() async {
     final db = await database;
     await db.close();

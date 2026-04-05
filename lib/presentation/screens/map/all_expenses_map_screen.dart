@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/theme/user_provider.dart';
 import '../../../data/models/expense_model.dart';
 import '../../../data/models/group_model.dart';
 import '../../../data/repositories/expense_repository.dart';
@@ -26,10 +29,17 @@ class _AllExpensesMapScreenState extends State<AllExpensesMapScreen> {
   }
 
   Future<void> _loadMarkers() async {
-    final groups = await _groupRepo.getAllGroups();
+    if (!mounted) return;
+    setState(() => _loading = true);
+
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final username = userProvider.userName;
+
+    // Get groups where the user is an owner or member
+    final userGroups = await _groupRepo.getGroupsForUser(username);
     final Set<Marker> newMarkers = {};
 
-    for (var group in groups) {
+    for (var group in userGroups) {
       final expenses = await _expenseRepo.getExpensesForGroup(group.id);
       for (var expense in expenses) {
         if (expense.hasLocation) {
@@ -63,7 +73,7 @@ class _AllExpensesMapScreenState extends State<AllExpensesMapScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _detailRow(Icons.payments_outlined, 'Amount', '₺${expense.amount.toStringAsFixed(2)}'),
+            _detailRow(Icons.payments_outlined, 'Amount', 'TRY ${expense.amount.toStringAsFixed(2)}'),
             const SizedBox(height: 8),
             _detailRow(Icons.group_outlined, 'Group', group.name),
             const SizedBox(height: 8),
@@ -77,9 +87,28 @@ class _AllExpensesMapScreenState extends State<AllExpensesMapScreen> {
             onPressed: () => Navigator.pop(context),
             child: const Text('Close'),
           ),
+          ElevatedButton.icon(
+            onPressed: () => _launchNavigation(expense.latitude!, expense.longitude!),
+            icon: const Icon(Icons.navigation_outlined, size: 18),
+            label: const Text('Directions'),
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _launchNavigation(double lat, double lng) async {
+    final url = 'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng';
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open navigation map')),
+        );
+      }
+    }
   }
 
   Widget _detailRow(IconData icon, String label, String value) {
@@ -103,8 +132,8 @@ class _AllExpensesMapScreenState extends State<AllExpensesMapScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Expense Locations'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())

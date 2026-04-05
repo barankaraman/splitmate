@@ -31,8 +31,11 @@ class SplitMateApp extends StatelessWidget {
           themeMode: themeProvider.themeMode,
           theme: _buildLightTheme(),
           darkTheme: _buildDarkTheme(),
-          home: const LoginScreen(),
-          routes: {'/home': (_) => const AppShell()},
+          home: const LoginScreen(), // Set LoginScreen as initial route
+          routes: {
+            '/home': (context) => const _AppShell(),
+            '/login': (context) => const LoginScreen(),
+          },
         ),
       ),
     );
@@ -56,7 +59,7 @@ class SplitMateApp extends StatelessWidget {
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
-        centerTitle: false,
+        centerTitle: true,
       ),
       cardTheme: CardThemeData(
         color: AppColors.cardBackground,
@@ -73,7 +76,7 @@ class SplitMateApp extends StatelessWidget {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.surface,
-        indicatorColor: AppColors.primary.withValues(alpha: 0.12),
+        indicatorColor: AppColors.primary.withOpacity(0.12),
       ),
     );
   }
@@ -101,7 +104,7 @@ class SplitMateApp extends StatelessWidget {
         backgroundColor: Color(0xFF1A1A2E),
         foregroundColor: Colors.white,
         elevation: 0,
-        centerTitle: false,
+        centerTitle: true,
       ),
       cardTheme: CardThemeData(
         color: darkCard,
@@ -118,7 +121,7 @@ class SplitMateApp extends StatelessWidget {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: darkSurface,
-        indicatorColor: AppColors.primary.withValues(alpha: 0.2),
+        indicatorColor: AppColors.primary.withOpacity(0.2),
       ),
       dividerColor: Colors.white12,
     );
@@ -162,14 +165,14 @@ class SplitMateApp extends StatelessWidget {
 // ─── App Shell ────────────────────────────────────────────────────────────────
 
 /// Bottom-navigation shell: Groups, Map, Tips, and Profile tabs.
-class AppShell extends StatefulWidget {
-  const AppShell({super.key});
+class _AppShell extends StatefulWidget {
+  const _AppShell();
 
   @override
-  State<AppShell> createState() => _AppShellState();
+  State<_AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> {
+class _AppShellState extends State<_AppShell> {
   int _currentIndex = 0;
 
   @override

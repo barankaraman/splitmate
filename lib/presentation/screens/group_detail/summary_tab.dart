@@ -69,17 +69,14 @@ class _SummaryTabState extends State<SummaryTab>
     }
 
     return RefreshIndicator(
-
       onRefresh: _load,
       color: AppColors.primary,
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Total expenses card
           _TotalCard(total: _groupTotal),
           const SizedBox(height: 16),
 
-          // Balances header
           Text(AppStrings.balances, style: AppTextStyles.titleLarge),
           const SizedBox(height: 10),
 
@@ -88,7 +85,7 @@ class _SummaryTabState extends State<SummaryTab>
               child: Text(
                 'Add members and expenses to see balances.',
                 style: AppTextStyles.bodyMedium.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                 textAlign: TextAlign.center,
               ),
             )
@@ -99,7 +96,6 @@ class _SummaryTabState extends State<SummaryTab>
 
           const SizedBox(height: 20),
 
-          // Navigate to Settlement screen
           ElevatedButton.icon(
             onPressed: () => Navigator.push(
               context,
@@ -113,12 +109,7 @@ class _SummaryTabState extends State<SummaryTab>
             icon: const Icon(Icons.account_balance_wallet_outlined),
             label: const Text(AppStrings.settlement),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              padding:
-                  const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(vertical: 14),
             ),
           ),
         ],
@@ -126,8 +117,6 @@ class _SummaryTabState extends State<SummaryTab>
     );
   }
 }
-
-// ─── Widgets ──────────────────────────────────────────────────────────────────
 
 class _TotalCard extends StatelessWidget {
   final double total;
@@ -155,7 +144,7 @@ class _TotalCard extends StatelessWidget {
               const Text(AppStrings.totalExpenses,
                   style: TextStyle(color: Colors.white70, fontSize: 13)),
               Text(
-                '₺${total.toStringAsFixed(2)}',
+                'TRY ${total.toStringAsFixed(2)}',
                 style: const TextStyle(
                     color: Colors.white,
                     fontSize: 26,
@@ -177,20 +166,19 @@ class _BalanceRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final isPositive = balance.netBalance >= 0;
     final color = isPositive ? AppColors.success : AppColors.error;
-    final label = isPositive ? 'alacaklı' : 'borçlu';
+    final label = isPositive ? 'is owed' : 'owes';
     final sign = isPositive ? '+' : '-';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundColor: color.withValues(alpha: 0.12),
+              backgroundColor: color.withOpacity(0.12),
               child: Text(
                 balance.member.name.isNotEmpty
                     ? balance.member.name[0].toUpperCase()
@@ -208,8 +196,8 @@ class _BalanceRow extends StatelessWidget {
                 children: [
                   Text(balance.member.name,
                       style: AppTextStyles.titleMedium),
-                  Text('Ödedi: ₺${balance.totalPaid.toStringAsFixed(2)} · '
-                      'Borcu: ₺${balance.totalOwed.toStringAsFixed(2)}',
+                  Text('Paid: TRY ${balance.totalPaid.toStringAsFixed(2)} · '
+                      'Share: TRY ${balance.totalOwed.toStringAsFixed(2)}',
                       style: AppTextStyles.bodySmall),
                 ],
               ),
@@ -218,7 +206,7 @@ class _BalanceRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '$sign₺${balance.netBalance.abs().toStringAsFixed(2)}',
+                  '$sign TRY ${balance.netBalance.abs().toStringAsFixed(2)}',
                   style: TextStyle(
                       color: color,
                       fontWeight: FontWeight.bold,

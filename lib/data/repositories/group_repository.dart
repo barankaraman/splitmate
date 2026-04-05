@@ -9,7 +9,7 @@ class GroupRepository {
 
   // ─── Read ────────────────────────────────────────────────────────────────────
 
-  /// Returns all groups ordered by newest first.
+  /// Returns all groups in the database.
   Future<List<GroupModel>> getAllGroups() async {
     final rows = await _db.query(
       DatabaseHelper.tableGroups,
@@ -18,7 +18,30 @@ class GroupRepository {
     return rows.map(GroupModel.fromMap).toList();
   }
 
-  /// Returns a single group by its [id], or null if not found.
+  /// Returns all groups for a specific owner, ordered by newest first.
+  Future<List<GroupModel>> getGroupsByOwner(String ownerId) async {
+    final rows = await _db.query(
+      DatabaseHelper.tableGroups,
+      where: 'owner_id = ?',
+      whereArgs: [ownerId],
+      orderBy: 'created_at DESC',
+    );
+    return rows.map(GroupModel.fromMap).toList();
+  }
+
+  /// Returns all groups where the user is a member or owner.
+  Future<List<GroupModel>> getGroupsForUser(String username) async {
+    final db = await _db.database;
+    final rows = await db.rawQuery('''
+      SELECT DISTINCT g.* FROM ${DatabaseHelper.tableGroups} g
+      LEFT JOIN ${DatabaseHelper.tableMembers} m ON g.id = m.group_id
+      WHERE g.owner_id = ? OR m.name = ?
+      ORDER BY g.created_at DESC
+    ''', [username, username]);
+    
+    return rows.map(GroupModel.fromMap).toList();
+  }
+
   Future<GroupModel?> getGroupById(String id) async {
     final rows = await _db.query(
       DatabaseHelper.tableGroups,
@@ -31,13 +54,11 @@ class GroupRepository {
 
   // ─── Write ───────────────────────────────────────────────────────────────────
 
-  /// Inserts a new group. Returns the inserted model unchanged.
   Future<GroupModel> insertGroup(GroupModel group) async {
     await _db.insert(DatabaseHelper.tableGroups, group.toMap());
     return group;
   }
 
-  /// Updates the [group]'s name and description.
   Future<void> updateGroup(GroupModel group) async {
     await _db.update(
       DatabaseHelper.tableGroups,
@@ -47,7 +68,6 @@ class GroupRepository {
     );
   }
 
-  /// Deletes a group and all cascaded data (members, expenses, participants).
   Future<void> deleteGroup(String id) async {
     await _db.delete(
       DatabaseHelper.tableGroups,

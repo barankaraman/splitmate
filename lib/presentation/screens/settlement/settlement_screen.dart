@@ -23,12 +23,10 @@ class SettlementScreen extends StatelessWidget {
     final suggestions = service.computeSettlements(balances);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnPrimary,
         title: Text('${group.name} · ${AppStrings.settlement}'),
         elevation: 0,
+        centerTitle: true,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -88,7 +86,7 @@ class _BalanceTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final isPos = balance.netBalance >= 0;
     final color = isPos ? AppColors.success : AppColors.error;
-    final statusText = isPos ? 'alacaklı' : 'borçlu';
+    final statusText = isPos ? 'is owed' : 'owes';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -97,7 +95,7 @@ class _BalanceTile extends StatelessWidget {
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: color.withValues(alpha: 0.12),
+          backgroundColor: color.withOpacity(0.12),
           child: Text(
             balance.member.name.isNotEmpty
                 ? balance.member.name[0].toUpperCase()
@@ -110,8 +108,8 @@ class _BalanceTile extends StatelessWidget {
         title: Text(balance.member.name,
             style: AppTextStyles.titleMedium),
         subtitle: Text(
-          'Ödedi ₺${balance.totalPaid.toStringAsFixed(2)} · '
-          'Borcu ₺${balance.totalOwed.toStringAsFixed(2)}',
+          'Paid TRY ${balance.totalPaid.toStringAsFixed(2)} · '
+          'Share TRY ${balance.totalOwed.toStringAsFixed(2)}',
           style: AppTextStyles.bodySmall,
         ),
         trailing: Column(
@@ -119,7 +117,7 @@ class _BalanceTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              '₺${balance.netBalance.abs().toStringAsFixed(2)}',
+              'TRY ${balance.netBalance.abs().toStringAsFixed(2)}',
               style: TextStyle(
                   color: color,
                   fontWeight: FontWeight.bold,
@@ -157,7 +155,7 @@ class _PaymentCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     backgroundColor:
-                        AppColors.error.withValues(alpha: 0.12),
+                        AppColors.error.withOpacity(0.12),
                     child: Text(
                       suggestion.fromMember.name.isNotEmpty
                           ? suggestion.fromMember.name[0]
@@ -183,7 +181,7 @@ class _PaymentCard extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    '₺${suggestion.amount.toStringAsFixed(2)}',
+                    'TRY ${suggestion.amount.toStringAsFixed(2)}',
                     style: AppTextStyles.amountMedium,
                     textAlign: TextAlign.center,
                   ),
@@ -193,7 +191,7 @@ class _PaymentCard extends StatelessWidget {
                       Expanded(
                         child: Container(
                           height: 2,
-                          color: AppColors.primary.withValues(alpha: 0.3),
+                          color: AppColors.primary.withOpacity(0.3),
                         ),
                       ),
                       const Icon(Icons.arrow_forward,
@@ -201,10 +199,10 @@ class _PaymentCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text('ödeyecek',
+                  Text('will pay',
                       style: TextStyle(
                           fontSize: 11,
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
                 ],
               ),
             ),
@@ -215,7 +213,7 @@ class _PaymentCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     backgroundColor:
-                        AppColors.success.withValues(alpha: 0.12),
+                        AppColors.success.withOpacity(0.12),
                     child: Text(
                       suggestion.toMember.name.isNotEmpty
                           ? suggestion.toMember.name[0].toUpperCase()

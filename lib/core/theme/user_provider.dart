@@ -1,33 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../services/auth_service.dart';
 
+/// Managed user data strictly using AuthService (which uses YAML storage).
 class UserProvider extends ChangeNotifier {
-  static const String _keyName = 'user_name';
-  static const String _keyEmail = 'user_email';
+  String get userName => AuthService.instance.currentUser.isNotEmpty 
+      ? AuthService.instance.currentUser 
+      : 'Guest';
+      
+  String get userEmail => AuthService.instance.isLoggedIn 
+      ? AuthService.instance.getEmail() 
+      : 'guest@example.com';
 
-  String _userName = 'Misafir';
-  String _userEmail = 'misafir@example.com';
-
-  String get userName => _userName;
-  String get userEmail => _userEmail;
-
-  UserProvider() {
-    _loadUserData();
-  }
-
-  Future<void> _loadUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    _userName = prefs.getString(_keyName) ?? 'Kullanıcı Adı';
-    _userEmail = prefs.getString(_keyEmail) ?? 'kullanici@email.com';
-    notifyListeners();
-  }
-
+  /// Updates user data in the YAML file via AuthService.
   Future<void> updateUserData(String name, String email) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyName, name);
-    await prefs.setString(_keyEmail, email);
-    _userName = name;
-    _userEmail = email;
+    // Note: Since usernames are our primary keys in YAML, 
+    // we primarily update the email here.
+    await AuthService.instance.updateUser(name, email);
     notifyListeners();
   }
+
+  void refresh() => notifyListeners();
 }
