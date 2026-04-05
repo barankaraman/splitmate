@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/services/auth_service.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../../core/theme/user_provider.dart';
+import '../auth/login_screen.dart';
 import 'user_expenses_screen.dart';
 import 'user_groups_screen.dart';
 
@@ -94,10 +96,21 @@ class ProfileScreen extends StatelessWidget {
             ),
             const Divider(),
             _ProfileMenuItem(
+              icon: Icons.lock_outline,
+              title: 'Şifre Değiştir',
+              onTap: () => _showChangePasswordDialog(context),
+            ),
+            _ProfileMenuItem(
               icon: Icons.logout,
               title: 'Çıkış Yap',
               textColor: AppColors.error,
-              onTap: () {},
+              onTap: () {
+                AuthService.instance.logout();
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              },
             ),
           ],
         ),
@@ -170,6 +183,126 @@ class ProfileScreen extends StatelessWidget {
             child: const Text('Kaydet'),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showChangePasswordDialog(BuildContext context) {
+    final oldController = TextEditingController();
+    final newController = TextEditingController();
+    final confirmController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    bool oldObscure = true;
+    bool newObscure = true;
+
+    const hintStyle = TextStyle(
+      color: Color(0xFFAAAAAA),
+      fontStyle: FontStyle.italic,
+      fontSize: 14,
+    );
+    const inputStyle = TextStyle(color: Color(0xFF212121));
+    const whiteFill = InputDecoration(
+      filled: true,
+      fillColor: Colors.white,
+    );
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Şifre Değiştir'),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: oldController,
+                  style: inputStyle,
+                  obscureText: oldObscure,
+                  decoration: whiteFill.copyWith(
+                    hintText: 'Mevcut şifre',
+                    hintStyle: hintStyle,
+                    suffixIcon: IconButton(
+                      icon: Icon(oldObscure
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined),
+                      onPressed: () =>
+                          setDialogState(() => oldObscure = !oldObscure),
+                    ),
+                  ),
+                  validator: (v) =>
+                      (v == null || v.isEmpty) ? 'Gerekli' : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: newController,
+                  style: inputStyle,
+                  obscureText: newObscure,
+                  decoration: whiteFill.copyWith(
+                    hintText: 'Yeni şifre',
+                    hintStyle: hintStyle,
+                    suffixIcon: IconButton(
+                      icon: Icon(newObscure
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined),
+                      onPressed: () =>
+                          setDialogState(() => newObscure = !newObscure),
+                    ),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Gerekli';
+                    if (v.length < 3) return 'En az 3 karakter';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: confirmController,
+                  style: inputStyle,
+                  obscureText: true,
+                  decoration: whiteFill.copyWith(
+                    hintText: 'Yeni şifreyi tekrarla',
+                    hintStyle: hintStyle,
+                  ),
+                  validator: (v) => v != newController.text
+                      ? 'Şifreler eşleşmiyor'
+                      : null,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('İptal'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (!formKey.currentState!.validate()) return;
+                final success = await AuthService.instance.changePassword(
+                  oldController.text,
+                  newController.text,
+                );
+                if (!ctx.mounted) return;
+                if (success) {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Şifre başarıyla değiştirildi')),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Mevcut şifre hatalı'),
+                      backgroundColor: AppColors.error,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Kaydet'),
+            ),
+          ],
+        ),
       ),
     );
   }

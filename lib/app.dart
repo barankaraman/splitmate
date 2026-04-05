@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'core/constants/app_colors.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/theme/user_provider.dart';
+import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/groups/groups_screen.dart';
 import 'presentation/screens/map/all_expenses_map_screen.dart';
 import 'presentation/screens/profile/profile_screen.dart';
@@ -30,7 +31,8 @@ class SplitMateApp extends StatelessWidget {
           themeMode: themeProvider.themeMode,
           theme: _buildLightTheme(),
           darkTheme: _buildDarkTheme(),
-          home: const _AppShell(),
+          home: const LoginScreen(),
+          routes: {'/home': (_) => const AppShell()},
         ),
       ),
     );
@@ -160,14 +162,14 @@ class SplitMateApp extends StatelessWidget {
 // ─── App Shell ────────────────────────────────────────────────────────────────
 
 /// Bottom-navigation shell: Groups, Map, Tips, and Profile tabs.
-class _AppShell extends StatefulWidget {
-  const _AppShell();
+class AppShell extends StatefulWidget {
+  const AppShell({super.key});
 
   @override
-  State<_AppShell> createState() => _AppShellState();
+  State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<_AppShell> {
+class _AppShellState extends State<AppShell> {
   int _currentIndex = 0;
 
   @override

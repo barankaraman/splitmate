@@ -34,6 +34,9 @@ dependencies:
   # Persistent storage
   shared_preferences: ^2.3.2
 
+  # YAML parsing (credentials file)
+  yaml: ^3.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -41,3 +44,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/credentials.yaml
