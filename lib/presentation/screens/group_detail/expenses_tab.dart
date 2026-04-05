@@ -12,16 +12,11 @@ import '../../../data/repositories/member_repository.dart';
 import '../expense/add_expense_screen.dart';
 
 /// Tab showing all recorded expenses for the group.
-///
-/// NOTE: This widget does NOT contain a Scaffold or FAB.
-/// The parent [GroupDetailScreen] owns the single Scaffold and calls
-/// [triggerAddExpense] via a GlobalKey when the FAB is tapped.
 class ExpensesTab extends StatefulWidget {
   final GroupModel group;
   const ExpensesTab({super.key, required this.group});
 
   @override
-  // Public state class so GroupDetailScreen can hold a GlobalKey<ExpensesTabState>.
   State<ExpensesTab> createState() => ExpensesTabState();
 }
 
@@ -104,8 +99,8 @@ class ExpensesTabState extends State<ExpensesTab>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Harcamayı Sil'),
-        content: Text('"${expense.title}" silinsin mi?'),
+        title: const Text('Delete Expense'),
+        content: Text('Delete "${expense.title}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -164,12 +159,12 @@ class ExpensesTabState extends State<ExpensesTab>
           children: [
             Icon(Icons.receipt_outlined,
                 size: 72,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35)),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.35)),
             const SizedBox(height: 12),
             Text(
               AppStrings.noExpenses,
               style: AppTextStyles.bodyLarge.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
               textAlign: TextAlign.center,
             ),
           ],
@@ -209,7 +204,7 @@ class _ExpenseCard extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(Icons.receipt_outlined,
@@ -223,7 +218,7 @@ class _ExpenseCard extends StatelessWidget {
                   Text(expense.title, style: AppTextStyles.titleMedium),
                   const SizedBox(height: 2),
                   Text(
-                    'Ödeyen: ${payer?.name ?? "?"} • $dateStr',
+                    'Paid by: ${payer?.name ?? "?"} • $dateStr',
                     style: AppTextStyles.bodySmall,
                   ),
                   if (expense.hasLocation) ...[
@@ -235,7 +230,7 @@ class _ExpenseCard extends StatelessWidget {
                         const SizedBox(width: 2),
                         Flexible(
                           child: Text(
-                            expense.locationLabel ?? 'Konum eklendi',
+                            expense.locationLabel ?? 'Location added',
                             style: AppTextStyles.caption
                                 .copyWith(color: AppColors.info),
                             overflow: TextOverflow.ellipsis,
@@ -251,7 +246,7 @@ class _ExpenseCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '₺${expense.amount.toStringAsFixed(2)}',
+                  'TRY ${expense.amount.toStringAsFixed(2)}',
                   style: AppTextStyles.amountMedium,
                 ),
                 const SizedBox(height: 4),

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/theme/user_provider.dart';
 import '../../../data/models/group_model.dart';
 import '../../../data/repositories/group_repository.dart';
 
-/// Form screen for creating OR editing a group.
 class AddGroupScreen extends StatefulWidget {
   final GroupModel? existingGroup;
 
@@ -45,6 +47,9 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
 
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final username = userProvider.userName;
+
     GroupModel result;
 
     if (widget.isEditing) {
@@ -56,6 +61,7 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
     } else {
       result = GroupModel(
         id: const Uuid().v4(),
+        ownerId: username, // Set the current user as the owner
         name: _nameController.text.trim(),
         description: _descriptionController.text.trim(),
         createdAt: DateTime.now(),
@@ -74,6 +80,7 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
       appBar: AppBar(
         title: Text(isEditing ? 'Edit Group' : AppStrings.createGroup),
         elevation: 0,
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -82,7 +89,6 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Group name
               Text(AppStrings.groupName, style: AppTextStyles.labelLarge),
               const SizedBox(height: 8),
               TextFormField(
@@ -98,7 +104,6 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Description (optional)
               Text(AppStrings.groupDescription,
                   style: AppTextStyles.labelLarge),
               const SizedBox(height: 8),
@@ -113,7 +118,6 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
               ),
               const SizedBox(height: 36),
 
-              // Save button
               ElevatedButton(
                 onPressed: _saving ? null : _save,
                 style: ElevatedButton.styleFrom(

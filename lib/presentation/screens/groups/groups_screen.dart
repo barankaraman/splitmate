@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/theme/user_provider.dart';
 import '../../../data/models/group_model.dart';
 import '../../../data/repositories/group_repository.dart';
 import '../../../data/repositories/expense_repository.dart';
@@ -32,9 +34,14 @@ class _GroupsScreenState extends State<GroupsScreen> {
   }
 
   Future<void> _loadGroups() async {
+    if (!mounted) return;
     setState(() => _loading = true);
 
-    final groups = await _groupRepo.getAllGroups();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final username = userProvider.userName;
+    
+    // Only fetch groups related to the logged-in user
+    final groups = await _groupRepo.getGroupsForUser(username);
 
     final totals = <String, double>{};
     for (final g in groups) {
@@ -98,7 +105,6 @@ class _GroupsScreenState extends State<GroupsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Let Scaffold use the theme's scaffoldBackgroundColor automatically
       appBar: AppBar(
         title: const Text(
           AppStrings.appName,
@@ -129,12 +135,12 @@ class _GroupsScreenState extends State<GroupsScreen> {
           children: [
             Icon(Icons.group_outlined,
                 size: 80,
-                color: Theme.of(context).hintColor.withValues(alpha: 0.35)),
+                color: Theme.of(context).hintColor.withOpacity(0.35)),
             const SizedBox(height: 16),
             Text(
               AppStrings.noGroups,
               style: AppTextStyles.bodyLarge.copyWith(
-                  color: Theme.of(context).hintColor.withValues(alpha: 0.6)),
+                  color: Theme.of(context).hintColor.withOpacity(0.6)),
               textAlign: TextAlign.center,
             ),
           ],
@@ -191,7 +197,7 @@ class _GroupCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 26,
-                backgroundColor: color.withValues(alpha: 0.15),
+                backgroundColor: color.withOpacity(0.15),
                 child: Text(
                   group.name.isNotEmpty
                       ? group.name[0].toUpperCase()
@@ -221,7 +227,7 @@ class _GroupCard extends StatelessWidget {
                     ],
                     const SizedBox(height: 4),
                     Text(
-                      'Total: ₺${total.toStringAsFixed(2)}',
+                      'Total: TRY ${total.toStringAsFixed(2)}',
                       style: AppTextStyles.bodySmall
                           .copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
                     ),
@@ -251,7 +257,7 @@ class _GroupCard extends StatelessWidget {
                 ],
               ),
               Icon(Icons.chevron_right,
-                  color: Theme.of(context).hintColor.withValues(alpha: 0.35)),
+                  color: Theme.of(context).hintColor.withOpacity(0.35)),
             ],
           ),
         ),

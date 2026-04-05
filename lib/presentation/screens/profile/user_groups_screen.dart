@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/user_provider.dart';
 import '../../../data/models/group_model.dart';
 import '../../../data/repositories/group_repository.dart';
@@ -50,14 +49,13 @@ class _UserGroupsScreenState extends State<UserGroupsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gruplarım'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        title: const Text('My Groups'),
+        centerTitle: true,
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _userGroups.isEmpty
-              ? const Center(child: Text('Henüz bir gruba dahil değilsiniz.'))
+              ? const Center(child: Text('You are not in any groups yet.'))
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: _userGroups.length,

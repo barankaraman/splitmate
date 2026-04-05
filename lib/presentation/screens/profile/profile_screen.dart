@@ -18,14 +18,13 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profil'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        title: const Text('Profile'),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => _showSettingsDialog(context),
-            tooltip: 'Ayarlar',
+            tooltip: 'Settings',
           ),
         ],
       ),
@@ -39,7 +38,7 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                    backgroundColor: AppColors.primary.withOpacity(0.1),
                     child: const Icon(
                       Icons.person,
                       size: 60,
@@ -63,7 +62,7 @@ class ProfileScreen extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () => _showEditProfileDialog(context, userProvider),
                     icon: const Icon(Icons.edit, size: 18),
-                    label: const Text('Profili Düzenle'),
+                    label: const Text('Edit Profile'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                     ),
@@ -76,7 +75,7 @@ class ProfileScreen extends StatelessWidget {
             const Divider(),
             _ProfileMenuItem(
               icon: Icons.account_balance_wallet_outlined,
-              title: 'Harcamalarım',
+              title: 'My Expenses',
               onTap: () {
                 Navigator.push(
                   context,
@@ -86,7 +85,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             _ProfileMenuItem(
               icon: Icons.group_outlined,
-              title: 'Gruplarım',
+              title: 'My Groups',
               onTap: () {
                 Navigator.push(
                   context,
@@ -97,12 +96,12 @@ class ProfileScreen extends StatelessWidget {
             const Divider(),
             _ProfileMenuItem(
               icon: Icons.lock_outline,
-              title: 'Şifre Değiştir',
+              title: 'Change Password',
               onTap: () => _showChangePasswordDialog(context),
             ),
             _ProfileMenuItem(
               icon: Icons.logout,
-              title: 'Çıkış Yap',
+              title: 'Logout',
               textColor: AppColors.error,
               onTap: () {
                 AuthService.instance.logout();
@@ -119,20 +118,14 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _showEditProfileDialog(BuildContext context, UserProvider userProvider) {
-    final nameController = TextEditingController();
-    final emailController = TextEditingController();
+    final nameController = TextEditingController(text: userProvider.userName);
+    final emailController = TextEditingController(text: userProvider.userEmail);
     final formKey = GlobalKey<FormState>();
-
-    const hintStyle = TextStyle(
-      color: Color(0xFFAAAAAA),
-      fontStyle: FontStyle.italic,
-      fontSize: 14,
-    );
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Profili Düzenle'),
+        title: const Text('Edit Profile'),
         content: Form(
           key: formKey,
           child: Column(
@@ -140,27 +133,21 @@ class ProfileScreen extends StatelessWidget {
             children: [
               TextFormField(
                 controller: nameController,
-                style: const TextStyle(color: Color(0xFF212121)),
                 decoration: const InputDecoration(
-                  hintText: 'Ad Soyad',
-                  hintStyle: hintStyle,
-                  fillColor: Colors.white,
-                  filled: true,
+                  labelText: 'Full Name',
+                  hintText: 'Enter your name',
                 ),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Gerekli' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: emailController,
-                style: const TextStyle(color: Color(0xFF212121)),
                 decoration: const InputDecoration(
-                  hintText: 'E-posta',
-                  hintStyle: hintStyle,
-                  fillColor: Colors.white,
-                  filled: true,
+                  labelText: 'Email',
+                  hintText: 'Enter your email',
                 ),
                 keyboardType: TextInputType.emailAddress,
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Gerekli' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
               ),
             ],
           ),
@@ -168,7 +155,7 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('İptal'),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -180,7 +167,7 @@ class ProfileScreen extends StatelessWidget {
                 Navigator.pop(context);
               }
             },
-            child: const Text('Kaydet'),
+            child: const Text('Save'),
           ),
         ],
       ),
@@ -195,22 +182,11 @@ class ProfileScreen extends StatelessWidget {
     bool oldObscure = true;
     bool newObscure = true;
 
-    const hintStyle = TextStyle(
-      color: Color(0xFFAAAAAA),
-      fontStyle: FontStyle.italic,
-      fontSize: 14,
-    );
-    const inputStyle = TextStyle(color: Color(0xFF212121));
-    const whiteFill = InputDecoration(
-      filled: true,
-      fillColor: Colors.white,
-    );
-
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Şifre Değiştir'),
+          title: const Text('Change Password'),
           content: Form(
             key: formKey,
             child: Column(
@@ -218,11 +194,9 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 TextFormField(
                   controller: oldController,
-                  style: inputStyle,
                   obscureText: oldObscure,
-                  decoration: whiteFill.copyWith(
-                    hintText: 'Mevcut şifre',
-                    hintStyle: hintStyle,
+                  decoration: InputDecoration(
+                    labelText: 'Current Password',
                     suffixIcon: IconButton(
                       icon: Icon(oldObscure
                           ? Icons.visibility_outlined
@@ -232,16 +206,14 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   validator: (v) =>
-                      (v == null || v.isEmpty) ? 'Gerekli' : null,
+                      (v == null || v.isEmpty) ? 'Required' : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: newController,
-                  style: inputStyle,
                   obscureText: newObscure,
-                  decoration: whiteFill.copyWith(
-                    hintText: 'Yeni şifre',
-                    hintStyle: hintStyle,
+                  decoration: InputDecoration(
+                    labelText: 'New Password',
                     suffixIcon: IconButton(
                       icon: Icon(newObscure
                           ? Icons.visibility_outlined
@@ -251,22 +223,20 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'Gerekli';
-                    if (v.length < 3) return 'En az 3 karakter';
+                    if (v == null || v.isEmpty) return 'Required';
+                    if (v.length < 3) return 'At least 3 characters';
                     return null;
                   },
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: confirmController,
-                  style: inputStyle,
                   obscureText: true,
-                  decoration: whiteFill.copyWith(
-                    hintText: 'Yeni şifreyi tekrarla',
-                    hintStyle: hintStyle,
+                  decoration: const InputDecoration(
+                    labelText: 'Repeat New Password',
                   ),
                   validator: (v) => v != newController.text
-                      ? 'Şifreler eşleşmiyor'
+                      ? 'Passwords do not match'
                       : null,
                 ),
               ],
@@ -275,7 +245,7 @@ class ProfileScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('İptal'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -288,18 +258,18 @@ class ProfileScreen extends StatelessWidget {
                 if (success) {
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Şifre başarıyla değiştirildi')),
+                    const SnackBar(content: Text('Password changed successfully')),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Mevcut şifre hatalı'),
+                      content: Text('Invalid current password'),
                       backgroundColor: AppColors.error,
                     ),
                   );
                 }
               },
-              child: const Text('Kaydet'),
+              child: const Text('Save'),
             ),
           ],
         ),
@@ -321,7 +291,7 @@ class ProfileScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  'Ayarlar',
+                  'Settings',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -334,9 +304,9 @@ class ProfileScreen extends StatelessWidget {
                       themeProvider.isDark ? Icons.dark_mode : Icons.light_mode,
                       color: AppColors.primary,
                     ),
-                    title: const Text('Karanlık Mod'),
+                    title: const Text('Dark Mode'),
                     subtitle: Text(
-                      themeProvider.isDark ? 'Açık moda geç' : 'Karanlık moda geç',
+                      themeProvider.isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
                     ),
                     value: themeProvider.isDark,
                     onChanged: (value) {

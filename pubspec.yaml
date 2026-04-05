@@ -33,9 +33,14 @@ dependencies:
 
   # Persistent storage
   shared_preferences: ^2.3.2
+  path_provider: ^2.1.5
 
-  # YAML parsing (credentials file)
+  # URL Launcher (for directions)
+  url_launcher: ^6.3.0
+
+  # YAML parsing and editing
   yaml: ^3.1.2
+  yaml_edit: ^2.2.1
 
 dev_dependencies:
   flutter_test:

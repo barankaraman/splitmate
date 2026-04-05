@@ -44,10 +44,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   @override
   void initState() {
     super.initState();
-    // Default: all members participate.
-    _participantIds =
-        widget.members.map((m) => m.id).toSet();
-    // Default payer: first member.
+    _participantIds = widget.members.map((m) => m.id).toSet();
     if (widget.members.isNotEmpty) {
       _payerId = widget.members.first.id;
     }
@@ -87,8 +84,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       return;
     }
 
-    final amount = double.tryParse(
-        _amountController.text.replaceAll(',', '.'));
+    final amount = double.tryParse(_amountController.text.replaceAll(',', '.'));
     if (amount == null || amount <= 0) {
       _showError(AppStrings.invalidAmount);
       return;
@@ -118,9 +114,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(message),
-          backgroundColor: AppColors.error),
+      SnackBar(content: Text(message), backgroundColor: AppColors.error),
     );
   }
 
@@ -134,15 +128,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     });
   }
 
-  // ─── Build ────────────────────────────────────────────────────────────────────
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnPrimary,
         title: const Text(AppStrings.addExpense),
         elevation: 0,
       ),
@@ -153,237 +142,117 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ── Title ────────────────────────────────────────────────────────
               _SectionLabel(AppStrings.expenseTitle),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _titleController,
-                decoration: _inputDeco(
-                    hint: AppStrings.expenseTitleHint,
-                    icon: Icons.label_outline),
+                decoration: _inputDeco(hint: AppStrings.expenseTitleHint, icon: Icons.label_outline),
                 textCapitalization: TextCapitalization.sentences,
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty)
-                        ? AppStrings.fieldRequired
-                        : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? AppStrings.fieldRequired : null,
               ),
               const SizedBox(height: 18),
 
-              // ── Amount ───────────────────────────────────────────────────────
               _SectionLabel(AppStrings.amount),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _amountController,
-                decoration: _inputDeco(
-                    hint: AppStrings.amountHint,
-                    icon: Icons.attach_money_outlined),
-                keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                      RegExp(r'^\d*[.,]?\d{0,2}'))
-                ],
+                decoration: _inputDeco(hint: AppStrings.amountHint, icon: Icons.money_rounded, suffixText: 'TRY'),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*[.,]?\d{0,2}'))],
                 validator: (v) {
-                  final parsed =
-                      double.tryParse(v?.replaceAll(',', '.') ?? '');
-                  if (parsed == null || parsed <= 0) {
-                    return AppStrings.invalidAmount;
-                  }
+                  final parsed = double.tryParse(v?.replaceAll(',', '.') ?? '');
+                  if (parsed == null || parsed <= 0) return AppStrings.invalidAmount;
                   return null;
                 },
               ),
               const SizedBox(height: 18),
 
-              // ── Payer dropdown ───────────────────────────────────────────────
               _SectionLabel(AppStrings.paidBy),
               const SizedBox(height: 8),
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: _payerId,
-                    isExpanded: true,
-                    icon: const Icon(Icons.keyboard_arrow_down,
-                        color: AppColors.primary),
-                    items: widget.members
-                        .map((m) => DropdownMenuItem(
-                              value: m.id,
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.person_outline,
-                                      size: 18,
-                                      color: AppColors.primary),
-                                  const SizedBox(width: 8),
-                                  Text(m.name,
-                                      style: AppTextStyles.bodyLarge),
-                                ],
-                              ),
-                            ))
-                        .toList(),
-                    onChanged: (v) => setState(() => _payerId = v),
-                  ),
-                ),
+              DropdownButtonFormField<String>(
+                value: _payerId,
+                decoration: _inputDeco(hint: '', icon: Icons.person_outline),
+                items: widget.members
+                    .map((m) => DropdownMenuItem(
+                          value: m.id,
+                          child: Text(m.name),
+                        ))
+                    .toList(),
+                onChanged: (v) => setState(() => _payerId = v),
               ),
               const SizedBox(height: 18),
 
-              // ── Participants ─────────────────────────────────────────────────
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _SectionLabel(AppStrings.splitAmong),
                   Row(
                     children: [
-                      TextButton(
-                        onPressed: () => _toggleAllParticipants(true),
-                        style: TextButton.styleFrom(
-                            foregroundColor: AppColors.primary),
-                        child: const Text('All',
-                            style: TextStyle(fontSize: 12)),
-                      ),
-                      TextButton(
-                        onPressed: () => _toggleAllParticipants(false),
-                        style: TextButton.styleFrom(
-                            foregroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
-                        child: const Text('None',
-                            style: TextStyle(fontSize: 12)),
-                      ),
+                      TextButton(onPressed: () => _toggleAllParticipants(true), child: const Text('All')),
+                      TextButton(onPressed: () => _toggleAllParticipants(false), child: const Text('None')),
                     ],
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
-                ),
+              Card(
                 child: Column(
                   children: widget.members.map((m) {
-                    final isSelected =
-                        _participantIds.contains(m.id);
+                    final isSelected = _participantIds.contains(m.id);
                     return CheckboxListTile(
                       value: isSelected,
                       onChanged: (checked) {
                         setState(() {
-                          if (checked == true) {
-                            _participantIds.add(m.id);
-                          } else {
-                            _participantIds.remove(m.id);
-                          }
+                          if (checked == true) _participantIds.add(m.id);
+                          else _participantIds.remove(m.id);
                         });
                       },
-                      title: Text(m.name,
-                          style: AppTextStyles.bodyLarge),
+                      title: Text(m.name),
                       activeColor: AppColors.primary,
-                      checkColor: Colors.white,
                       secondary: CircleAvatar(
-                        radius: 16,
-                        backgroundColor: AppColors.primary
-                            .withValues(alpha: 0.12),
-                        child: Text(
-                          m.name.isNotEmpty
-                              ? m.name[0].toUpperCase()
-                              : '?',
-                          style: const TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12),
-                        ),
+                        radius: 14,
+                        child: Text(m.name.isNotEmpty ? m.name[0].toUpperCase() : '?', style: const TextStyle(fontSize: 12)),
                       ),
-                      controlAffinity:
-                          ListTileControlAffinity.trailing,
+                      controlAffinity: ListTileControlAffinity.trailing,
                       dense: true,
                     );
                   }).toList(),
                 ),
               ),
 
-              // Per-person share preview
-              if (_participantIds.isNotEmpty &&
-                  _amountController.text.isNotEmpty)
+              if (_participantIds.isNotEmpty && _amountController.text.isNotEmpty)
                 Padding(
-                  padding: const EdgeInsets.only(top: 8),
+                  padding: const EdgeInsets.only(top: 12),
                   child: Builder(builder: (ctx) {
-                    final amt = double.tryParse(
-                        _amountController.text.replaceAll(',', '.'));
-                    if (amt == null || amt <= 0) {
-                      return const SizedBox.shrink();
-                    }
-                    final share =
-                        amt / _participantIds.length;
+                    final amt = double.tryParse(_amountController.text.replaceAll(',', '.'));
+                    if (amt == null || amt <= 0) return const SizedBox.shrink();
+                    final share = amt / _participantIds.length;
                     return Text(
-                      '₺${share.toStringAsFixed(2)} kişi başı',
-                      style: AppTextStyles.bodySmall
-                          .copyWith(color: AppColors.primary),
+                      'TRY ${share.toStringAsFixed(2)} per person',
+                      style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     );
                   }),
                 ),
 
-              const SizedBox(height: 18),
+              const SizedBox(height: 24),
 
-              // ── Location ─────────────────────────────────────────────────────
               OutlinedButton.icon(
                 onPressed: _pickLocation,
-                icon: Icon(
-                  _selectedLocation != null
-                      ? Icons.location_on
-                      : Icons.add_location_outlined,
-                  color: _selectedLocation != null
-                      ? AppColors.success
-                      : AppColors.primary,
-                ),
-                label: Text(
-                  _selectedLocation != null
-                      ? (_locationLabel ?? AppStrings.locationAttached)
-                      : AppStrings.selectLocation,
-                  style: TextStyle(
-                    color: _selectedLocation != null
-                        ? AppColors.success
-                        : AppColors.primary,
-                    fontSize: 14,
-                  ),
-                ),
+                icon: Icon(_selectedLocation != null ? Icons.location_on : Icons.add_location_outlined),
+                label: Text(_selectedLocation != null ? (_locationLabel ?? AppStrings.locationAttached) : AppStrings.selectLocation),
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                    color: _selectedLocation != null
-                        ? AppColors.success
-                        : AppColors.primary,
-                  ),
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
               const SizedBox(height: 28),
 
-              // ── Save ─────────────────────────────────────────────────────────
               ElevatedButton(
                 onPressed: _saving ? null : _save,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
+                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
                 child: _saving
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                            color: Colors.white, strokeWidth: 2))
-                    : const Text(AppStrings.save,
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold)),
+                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : const Text(AppStrings.save, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -392,40 +261,18 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     );
   }
 
-  InputDecoration _inputDeco(
-          {required String hint, required IconData icon}) =>
-      InputDecoration(
+  InputDecoration _inputDeco({required String hint, required IconData icon, String? suffixText}) => InputDecoration(
         hintText: hint,
-        prefixIcon: Icon(icon, color: AppColors.primary),
-        filled: true,
-        fillColor: AppColors.surface,
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.border)),
-        enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.border)),
-        focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide:
-                const BorderSide(color: AppColors.primary, width: 2)),
-        errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.error)),
-        contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16, vertical: 14),
+        prefixIcon: Icon(icon),
+        suffixText: suffixText,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       );
 }
-
-// ─── Helper ───────────────────────────────────────────────────────────────────
 
 class _SectionLabel extends StatelessWidget {
   final String text;
   const _SectionLabel(this.text);
 
   @override
-  Widget build(BuildContext context) => Text(
-        text,
-        style: AppTextStyles.labelLarge,
-      );
+  Widget build(BuildContext context) => Text(text, style: AppTextStyles.labelLarge);
 }
